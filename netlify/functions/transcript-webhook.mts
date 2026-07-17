@@ -6,8 +6,13 @@ interface VapiMessage {
   endedReason?: string;
   call?: {
     id: string;
+    assistantId?: string;
     startedAt?: string;
     endedAt?: string;
+  };
+  assistant?: {
+    id?: string;
+    name?: string;
   };
   artifact?: {
     transcript?: string;
@@ -61,6 +66,8 @@ export default async (req: Request, context: Context) => {
     const transcriptData = {
       sessionId,
       callId,
+      assistantId: message.call?.assistantId || message.assistant?.id || null,
+      assistantName: message.assistant?.name || null,
       timestamp: now.toISOString(),
       endedReason: message.endedReason,
       transcript,

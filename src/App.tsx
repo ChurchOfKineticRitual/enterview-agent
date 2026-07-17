@@ -50,6 +50,15 @@ function getContextFromUrl(): string {
   return params.get('context') || '';
 }
 
+// Get assistant ID from URL parameter (lets a scheduled nudge link dial the
+// assistant it prepared, e.g. the Daily Check-in, instead of the default)
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function getAssistantIdFromUrl(): string {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('assistant') || '';
+  return UUID_RE.test(id) ? id : '';
+}
+
 // Cascading Text Component with react-spring animations
 const CascadingText = ({ 
   text, 
@@ -257,7 +266,7 @@ function App() {
   const startCall = async () => {
     if (!vapiRef.current || !isConnected) return;
 
-    const assistantId = import.meta.env.VITE_VAPI_ASSISTANT_ID;
+    const assistantId = getAssistantIdFromUrl() || import.meta.env.VITE_VAPI_ASSISTANT_ID;
     if (!assistantId) {
       console.error('Missing VITE_VAPI_ASSISTANT_ID');
       return;
